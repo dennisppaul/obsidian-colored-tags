@@ -1,4 +1,4 @@
-import { debounce, Plugin } from "obsidian";
+import { debounce, MarkdownView, Plugin } from "obsidian";
 import { coloredClassApplierPlugin } from "./ColoredClassApplierPlugin";
 import { BaseViewTagApplier } from "./tag-appliers/BaseViewTagApplier";
 import { ColoredTagsPluginSettingTab } from "./ColoredTagsPluginSettingTab";
@@ -12,6 +12,12 @@ import { CSSManager } from "./CSSManager";
 import { TagManager } from "./TagManager";
 import { normalizePaletteIndex, normalizeTagName } from "./tagUtils";
 import { PropertiesTagApplier } from "./tag-appliers/PropertiesTagApplier";
+import {
+	applyPrefixedTagsInElement,
+	createPrefixedTagsEditorExtension,
+	PREFIXED_TAG_CLASS,
+	sanitizeTagPrefix,
+} from "./PrefixedTags";
 
 type LegacySettingsData = {
 	_version: number;
@@ -26,6 +32,7 @@ type LegacySettingsData = {
 export default class ColoredTagsPlugin extends Plugin {
 	private static readonly EDITOR_CHANGE_DEBOUNCE = 3000; // 3 seconds
 	private static readonly LEAF_CHANGE_DEBOUNCE = 300; // 300ms
+	private static readonly PREFIXED_TAGS_DEBOUNCE = 500; // 500ms
 
 	settings!: ColoredTagsPluginSettings;
 	palettes = {
@@ -48,7 +55,16 @@ export default class ColoredTagsPlugin extends Plugin {
 		await this.loadSettings();
 		this.colorService = new ColorService();
 		this.cssManager = new CSSManager();
-		this.tagManager = new TagManager(this.settings.knownTags);
+		this.tagManager = new TagManager(
+			this.settings.knownTags,
+			this.settings.prefixedTags,
+		);
+
+		this.registerMarkdownPostProcessor((el) => {
+			this.registerPrefixedTags(
+				applyPrefixedTagsInElement(el, this.getTagPrefix()),
+			);
+		});
 
 		this.registerEvent(
 			this.app.workspace.on("window-open", (workspaceWindow) => {
@@ -95,6 +111,13 @@ export default class ColoredTagsPlugin extends Plugin {
 
 			this.addSettingTab(new ColoredTagsPluginSettingTab(this.app, this));
 			this.registerEditorExtension(coloredClassApplierPlugin);
+			this.registerEditorExtension(
+				createPrefixedTagsEditorExtension({
+					getPrefix: () => this.getTagPrefix(),
+					onTagsFound: (tagNames) =>
+						this.registerPrefixedTags(tagNames),
+				}),
+			);
 		});
 	}
 
@@ -130,6 +153,44 @@ export default class ColoredTagsPlugin extends Plugin {
 			await this.saveData(this.settings);
 		}
 	}
+
+	getTagPrefix(): string {
+		return sanitizeTagPrefix(this.settings.tagPrefix);
+	}
+
+	/**
+	 * Re-renders open editors and reading views, e.g. after the tag prefix
+	 * has been changed.
+	 */
+	refreshPrefixedTags(): void {
+		this.app.workspace.updateOptions();
+		this.app.workspace.iterateAllLeaves((leaf) => {
+			if (leaf.view instanceof MarkdownView) {
+				leaf.view.previewMode.rerender(true);
+			}
+		});
+	}
+
+	private registerPrefixedTags(tagNames: string[]): void {
+		if (!this.tagManager.addPrefixedTags(tagNames)) {
+			return;
+		}
+		this.settings.prefixedTags = this.tagManager.exportPrefixedTags();
+		this.flushPrefixedTags();
+	}
+
+	private flushPrefixedTags = debounce(
+		async () => {
+			await this.saveKnownTags();
+			await this.saveData(this.settings);
+			// Colors can only be generated after the palettes are loaded
+			if (this.palettes.light.length) {
+				this.update();
+			}
+		},
+		ColoredTagsPlugin.PREFIXED_TAGS_DEBOUNCE,
+		true,
+	);
 
 	update() {
 		const tags = this.tagManager.getTagsMap();
@@ -250,6 +311,7 @@ export default class ColoredTagsPlugin extends Plugin {
 		const selectors = [
 			`a.tag[href="${tagHref}" i]`,
 			`a.tag.colored-tag-${tagLower}`,
+			`.${PREFIXED_TAG_CLASS}.colored-tag-${tagLower}`,
 			`.cm-s-obsidian .cm-line span.cm-hashtag.colored-tag-${tagLower}`,
 			`.metadata-property[data-property-key="tags" i] .multi-select-pill.colored-tag-${tagLower}`,
 			`.bases-metadata-value[data-property-type="tags" i] .multi-select-pill.colored-tag-${tagLower}`,

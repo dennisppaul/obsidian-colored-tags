@@ -16,5 +16,7 @@ export const DEFAULT_SETTINGS: ColoredTagsPluginSettings = {
 	},
 	knownTags: {},
 	tagColors: {},
+	tagPrefix: "",
+	prefixedTags: [],
 	_version: 4,
 };

@@ -26,6 +26,10 @@
 				}
 			}
 		},
+		"tagPrefix": {
+			"name": "Prefijo de etiqueta adicional",
+			"description": "Colorear también como etiquetas las palabras que empiezan con este carácter, p. ej. @ para @nombre. Comparten colores con #nombre, pero no son etiquetas reales de Obsidian. Déjalo vacío para desactivarlo."
+		},
 		"accessibility": {
 			"heading": "🦾 Accesibilidad",
 			"description": "Mostrar opciones de accesibilidad",

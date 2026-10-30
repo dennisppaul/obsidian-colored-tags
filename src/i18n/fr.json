@@ -26,6 +26,10 @@
 				}
 			}
 		},
+		"tagPrefix": {
+			"name": "Préfixe de tag supplémentaire",
+			"description": "Colorer aussi comme des tags les mots commençant par ce caractère, p. ex. @ pour @nom. Ils partagent les couleurs de #nom, mais ne sont pas de vrais tags Obsidian. Laisser vide pour désactiver."
+		},
 		"accessibility": {
 			"heading": "🦾 Accessibilité",
 			"description": "Afficher les options d'accessibilité",

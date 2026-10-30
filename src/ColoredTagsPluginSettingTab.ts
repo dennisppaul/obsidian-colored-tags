@@ -10,6 +10,7 @@ import { DEFAULT_SETTINGS } from "./defaultSettings";
 import { ColoredTagsPaletteType } from "./interfaces";
 import { I18n } from "./i18n";
 import { normalizePaletteIndex, normalizeTagName } from "./tagUtils";
+import { sanitizeTagPrefix } from "./PrefixedTags";
 import {
 	CommunityPalette,
 	CommunityPalettesService,
@@ -73,6 +74,15 @@ export class ColoredTagsPluginSettingTab extends PluginSettingTab {
 					const paletteEl =
 						this.declarativePaletteEl ?? this.createDeclarativePalette(host);
 					this.renderPaletteSettings(host, paletteEl);
+				},
+			},
+			{
+				name: I18n.t("settings.tagPrefix.name"),
+				desc: I18n.t("settings.tagPrefix.description"),
+				render: (setting: Setting) => {
+					this.renderTagPrefixSettings(
+						this.prepareDeclarativeHost(setting),
+					);
 				},
 			},
 			{
@@ -498,6 +508,22 @@ export class ColoredTagsPluginSettingTab extends PluginSettingTab {
 			}
 			card.setAttribute("aria-pressed", isSelected ? "true" : "false");
 		});
+	}
+
+	private renderTagPrefixSettings(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName(I18n.t("settings.tagPrefix.name"))
+			.setDesc(I18n.t("settings.tagPrefix.description"))
+			.addText((text) =>
+				text
+					.setPlaceholder("@")
+					.setValue(this.plugin.settings.tagPrefix)
+					.onChange(async (value) => {
+						this.plugin.settings.tagPrefix = sanitizeTagPrefix(value);
+						await this.plugin.saveSettings();
+						this.plugin.refreshPrefixedTags();
+					}),
+			);
 	}
 
 	private renderAccessibilitySettings(containerEl: HTMLElement): void {

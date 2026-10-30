@@ -26,6 +26,10 @@
 				}
 			}
 		},
+		"tagPrefix": {
+			"name": "追加のタグ接頭辞",
+			"description": "この文字で始まる単語もタグのように色付けします。例: @name には @。#name と同じ色になりますが、Obsidian の本当のタグではありません。空欄で無効になります。"
+		},
 		"accessibility": {
 			"heading": "🦾 アクセシビリティ",
 			"description": "アクセシビリティオプションを表示",

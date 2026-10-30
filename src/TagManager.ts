@@ -11,8 +11,13 @@ declare module "obsidian" {
 export class TagManager {
 	private tagsMap: Map<string, number>;
 	private renderedTags = new Set<string>();
+	private prefixedTags = new Set<string>();
 
-	constructor(knownTags: Record<string, number>) {
+	constructor(
+		knownTags: Record<string, number>,
+		prefixedTags: string[] = [],
+	) {
+		this.addPrefixedTags(prefixedTags);
 		const normalized: Array<[string, number]> = [];
 		for (const [tagName, order] of Object.entries(knownTags || {})) {
 			const normalizedName = normalizeTagName(tagName);
@@ -51,9 +56,33 @@ export class TagManager {
 		return hasChanges;
 	}
 
+	/**
+	 * Registers tags found with the additional tag prefix (e.g. `@tag`).
+	 * Returns true if any of them was not registered before.
+	 */
+	addPrefixedTags(tagNames: string[]): boolean {
+		let hasNew = false;
+		for (const tagName of tagNames) {
+			const normalized = normalizeTagName(tagName);
+			if (normalized && !this.prefixedTags.has(normalized)) {
+				this.prefixedTags.add(normalized);
+				hasNew = true;
+			}
+		}
+		return hasNew;
+	}
+
+	exportPrefixedTags(): string[] {
+		return Array.from(this.prefixedTags);
+	}
+
 	private collectTagPaths(metadataCache: MetadataCache): string[] {
 		const paths = new Set<string>();
-		for (const rawTag of Object.keys(metadataCache.getTags())) {
+		const rawTags = [
+			...Object.keys(metadataCache.getTags()),
+			...this.prefixedTags,
+		];
+		for (const rawTag of rawTags) {
 			const tag = normalizeTagName(rawTag);
 			if (!tag) {
 				continue;

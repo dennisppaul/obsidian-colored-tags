@@ -26,6 +26,10 @@
 				}
 			}
 		},
+		"tagPrefix": {
+			"name": "额外的标签前缀",
+			"description": "将以此字符开头的单词也像标签一样着色，例如 @name 使用 @。它们与 #name 共用颜色，但不是真正的 Obsidian 标签。留空以禁用。"
+		},
 		"accessibility": {
 			"heading": "🦾 无障碍",
 			"description": "显示无障碍选项",

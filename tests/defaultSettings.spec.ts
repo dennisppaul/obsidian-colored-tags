@@ -17,6 +17,8 @@ describe("DEFAULT_SETTINGS", () => {
 			},
 			knownTags: {},
 			tagColors: {},
+			tagPrefix: "",
+			prefixedTags: [],
 			_version: 4,
 		});
 	});

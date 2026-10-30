@@ -248,3 +248,13 @@
 .colored-tags-settings .colored-tags-declarative-content {
 	width: 100%;
 }
+
+.colored-prefixed-tag {
+	background-color: var(--tag-background);
+	color: var(--tag-color);
+	border-radius: var(--tag-radius);
+	padding: var(--tag-padding-y) var(--tag-padding-x);
+	font-size: var(--tag-size);
+	font-weight: var(--tag-weight);
+	text-decoration: var(--tag-decoration);
+}

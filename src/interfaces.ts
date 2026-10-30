@@ -15,6 +15,8 @@ export interface ColoredTagsPluginSettings {
 	tagColors: {
 		[name: string]: number;
 	};
+	tagPrefix: string;
+	prefixedTags: string[];
 	_version: number;
 }
 

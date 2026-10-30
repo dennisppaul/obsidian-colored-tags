@@ -26,6 +26,10 @@
 				}
 			}
 		},
+		"tagPrefix": {
+			"name": "Additional tag prefix",
+			"description": "Also color words starting with this character like tags, e.g. @ for @name. They share colors with #name, but are not real Obsidian tags. Leave empty to disable."
+		},
 		"accessibility": {
 			"heading": "🦾 Accessibility",
 			"description": "Show accessibility options",

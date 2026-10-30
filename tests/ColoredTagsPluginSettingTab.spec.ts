@@ -278,6 +278,30 @@ describe("ColoredTagsPluginSettingTab", () => {
 			expect(findSetting(tab.containerEl, "Mix colors")).toBeTruthy();
 		});
 
+		it("saves a sanitized tag prefix and refreshes views", async () => {
+			const saveSettings = vi.fn(async () => {});
+			const { tab, plugin } = createTab({ saveSettings });
+			const refreshPrefixedTags = vi.fn();
+			(plugin as any).refreshPrefixedTags = refreshPrefixedTags;
+			const container = document.createElement("div");
+
+			tab["renderTagPrefixSettings"](container as any);
+			const input = container.querySelector("input") as HTMLInputElement;
+			expect(input.placeholder).toBe("@");
+
+			input.value = " @ ";
+			input.dispatchEvent(new Event("input"));
+			await tick();
+			expect(plugin.settings.tagPrefix).toBe("@");
+			expect(saveSettings).toHaveBeenCalled();
+			expect(refreshPrefixedTags).toHaveBeenCalled();
+
+			input.value = "#";
+			input.dispatchEvent(new Event("input"));
+			await tick();
+			expect(plugin.settings.tagPrefix).toBe("");
+		});
+
 		it("changes palette type via dropdown and triggers save", async () => {
 			const saveSettings = vi.fn(async () => {});
 			const { tab, plugin } = createTab({ saveSettings });

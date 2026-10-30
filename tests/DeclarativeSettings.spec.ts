@@ -26,11 +26,12 @@ describe("declarative settings", () => {
 		const tab = new ColoredTagsPluginSettingTab(app, plugin);
 		const definitions = tab.getSettingDefinitions();
 
-		expect(definitions).toHaveLength(4);
+		expect(definitions).toHaveLength(5);
 		expect(definitions[0].searchable).toBe(false);
 		expect(definitions[1].aliases ?? []).toHaveLength(3);
-		expect(definitions[2].aliases ?? []).toHaveLength(1);
-		expect(definitions[3].aliases ?? []).toHaveLength(4);
+		expect(definitions[2].aliases ?? []).toHaveLength(0);
+		expect(definitions[3].aliases ?? []).toHaveLength(1);
+		expect(definitions[4].aliases ?? []).toHaveLength(4);
 	});
 
 	it("renders declarative sections through existing imperative renderers", () => {
@@ -51,7 +52,7 @@ describe("declarative settings", () => {
 		expect(tab.containerEl.querySelector(".palette")).not.toBeNull();
 		expect(
 			tab.containerEl.querySelectorAll(".colored-tags-declarative-host"),
-		).toHaveLength(4);
+		).toHaveLength(5);
 		expect(tab.containerEl.querySelector("select")).not.toBeNull();
 		expect(
 			tab.containerEl.querySelectorAll('input[type="checkbox"]').length,

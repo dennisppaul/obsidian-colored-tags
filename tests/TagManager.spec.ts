@@ -274,4 +274,21 @@ describe("TagManager", () => {
 
 		expect(manager.getTagsMap().size).toBe(0);
 	});
+
+	it("includes prefixed tags and their parents in known tags", async () => {
+		const manager = new TagManager({}, ["#Team/Dev", ""]);
+		expect(manager.exportPrefixedTags()).toEqual(["team/dev"]);
+
+		expect(manager.addPrefixedTags(["team/dev", "Alice"])).toBe(true);
+		expect(manager.addPrefixedTags(["alice"])).toBe(false);
+		expect(manager.exportPrefixedTags()).toEqual(["team/dev", "alice"]);
+
+		await manager.updateKnownTags(createMetadataCache(["#c"]));
+		expect(Object.keys(manager.exportKnownTags()).sort()).toEqual([
+			"alice",
+			"c",
+			"team",
+			"team/dev",
+		]);
+	});
 });

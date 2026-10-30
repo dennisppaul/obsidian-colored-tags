@@ -17,6 +17,8 @@ export class App {
 
 export class Workspace {
 	on = vi.fn();
+	updateOptions = vi.fn();
+	iterateAllLeaves = vi.fn();
 	onLayoutReady(callback: () => void): void {
 		// In tests, execute callback immediately
 		callback();
@@ -52,6 +54,10 @@ export class Vault {
 		return `Mock content for ${file.name}`;
 	}
 }
+export class MarkdownView {
+	previewMode = { rerender: vi.fn() };
+}
+
 export class Notice {
 	constructor(_message: string) {}
 }
@@ -74,6 +80,7 @@ export class Plugin {
 
 	registerEvent = vi.fn();
 	registerEditorExtension = vi.fn();
+	registerMarkdownPostProcessor = vi.fn();
 
 	addSettingTab(tab: PluginSettingTab): void {
 		this.settingTabs.push(tab);

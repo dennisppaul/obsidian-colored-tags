@@ -26,6 +26,10 @@
 				}
 			}
 		},
+		"tagPrefix": {
+			"name": "Zusätzliches Tag-Präfix",
+			"description": "Wörter mit diesem Zeichen am Anfang ebenfalls wie Tags einfärben, z. B. @ für @name. Sie teilen sich die Farben mit #name, sind aber keine echten Obsidian-Tags. Leer lassen zum Deaktivieren."
+		},
 		"accessibility": {
 			"heading": "🦾 Barrierefreiheit",
 			"description": "Barrierefreiheitsoptionen anzeigen",
